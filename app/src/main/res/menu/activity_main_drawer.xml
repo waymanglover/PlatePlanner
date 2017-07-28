@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <group android:checkableBehavior="single">
+        <item
+            android:id="@+id/nav_planner"
+            android:icon="@drawable/ic_event_black_24dp"
+            android:title="@string/nav_planner" />
+        <item
+            android:id="@+id/nav_shopping"
+            android:icon="@drawable/ic_shopping_cart_black_24dp"
+            android:title="@string/nav_shopping" />
+        <item
+            android:id="@+id/nav_meals"
+            android:icon="@drawable/ic_restaurant_menu_black_24dp"
+            android:title="@string/nav_recipes" />
+        <item
+            android:id="@+id/nav_ingredients"
+            android:icon="@drawable/ic_kitchen_black_24dp"
+            android:title="@string/nav_ingredients" />
+        <item
+            android:id="@+id/nav_settings"
+            android:icon="@drawable/ic_settings_black_24dp"
+            android:title="@string/nav_settings" />
+    </group>
+</menu>

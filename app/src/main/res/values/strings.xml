@@ -1,0 +1,14 @@
+<resources>
+    <string name="app_name">PlatePlanner</string>
+
+    <string name="navigation_drawer_open">Open navigation drawer</string>
+    <string name="navigation_drawer_close">Close navigation drawer</string>
+    <!--<string name="title_activity_edit_ingredient">EditIngredient</string>-->
+
+    <string name="nav_planner">Meal Planner</string>
+    <string name="nav_recipes">Recipes</string>
+    <string name="nav_ingredients">Ingredients</string>
+    <string name="nav_shopping">Shopping List</string>
+    <string name="nav_settings">Settings</string>
+    <string name="action_delete">Delete</string>
+</resources>
