@@ -2,6 +2,7 @@ package com.wglover.plateplanner.fragments;
 
 import android.content.Context;
 import android.database.Cursor;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
@@ -17,38 +18,33 @@ import android.view.ViewGroup;
 
 import com.wglover.plateplanner.MainActivity;
 import com.wglover.plateplanner.R;
-import com.wglover.plateplanner.adapters.IngredientsAdapter;
-import com.wglover.plateplanner.classes.Ingredient;
+import com.wglover.plateplanner.adapters.ListAdapter;
 import com.wglover.plateplanner.database.DbProvider;
 import com.wglover.plateplanner.database.SQL;
 
 /**
  * A fragment representing a list of Items.
  * <p/>
- * Activities containing this fragment MUST implement the {@link IngredientListener}
+ * Activities containing this fragment MUST implement the {@link ItemListener}
  * interface.
  */
-public class IngredientsFragment extends Fragment implements LoaderManager.LoaderCallbacks<Cursor> {
-    private static final String ARG_COLUMN_COUNT = "column-count";
-
-    private int mColumnCount = 1;
-
-    private IngredientListener mListener;
-    private IngredientsAdapter mAdapter;
-
+public class ListFragment extends Fragment implements LoaderManager.LoaderCallbacks<Cursor> {
+    private static final String ARG_TYPE = "list-type";
+    private int mType = 0;
+    private ItemListener mListener;
+    private ListAdapter mAdapter;
     /**
      * Mandatory empty constructor for the fragment manager to instantiate the
      * fragment (e.g. upon screen orientation changes).
      */
-    public IngredientsFragment() {
+    public ListFragment() {
     }
 
-    // TODO: Customize parameter initialization
     @SuppressWarnings("unused")
-    public static IngredientsFragment newInstance(int columnCount) {
-        IngredientsFragment fragment = new IngredientsFragment();
+    public static ListFragment newInstance(int type) {
+        ListFragment fragment = new ListFragment();
         Bundle args = new Bundle();
-        args.putInt(ARG_COLUMN_COUNT, columnCount);
+        args.putInt(ARG_TYPE, type);
         fragment.setArguments(args);
         return fragment;
     }
@@ -58,16 +54,16 @@ public class IngredientsFragment extends Fragment implements LoaderManager.Loade
         super.onCreate(savedInstanceState);
 
         if (getArguments() != null) {
-            mColumnCount = getArguments().getInt(ARG_COLUMN_COUNT);
+            mType = getArguments().getInt(ARG_TYPE);
         }
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.fragment_ingredients_list, container, false);
+        View view = inflater.inflate(R.layout.fragment_list, container, false);
         RecyclerView recyclerView = (RecyclerView) view.findViewById(R.id.list);
-        this.mAdapter = new IngredientsAdapter(getContext(), null, (MainActivity) getActivity());
+        this.mAdapter = new ListAdapter(getContext(), null, (MainActivity) getActivity(), mType);
 
         // Set the adapter
         if (recyclerView instanceof RecyclerView) {
@@ -76,11 +72,11 @@ public class IngredientsFragment extends Fragment implements LoaderManager.Loade
             recyclerView.setAdapter(mAdapter);
         }
 
-        FloatingActionButton fab = (FloatingActionButton) view.findViewById(R.id.ingredient_add_fab);
+        FloatingActionButton fab = (FloatingActionButton) view.findViewById(R.id.list_add_fab);
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                mListener.addEditIngredient(null);
+                mListener.addEdit(null, mType);
             }
         });
 
@@ -92,17 +88,18 @@ public class IngredientsFragment extends Fragment implements LoaderManager.Loade
         super.onActivityCreated(savedInstanceState);
         // Prepare the loader.  Either re-connect with an existing one,
         // or start a new one.
-        getLoaderManager().initLoader(0, null, this);
+        Bundle args = new Bundle();
+        getLoaderManager().initLoader(0, args, this);
     }
 
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);
-        if (context instanceof IngredientListener) {
-            mListener = (IngredientListener) context;
+        if (context instanceof ItemListener) {
+            mListener = (ItemListener) context;
         } else {
             throw new RuntimeException(context.toString()
-                    + " must implement IngredientListener");
+                    + " must implement ItemListener");
         }
     }
 
@@ -115,8 +112,16 @@ public class IngredientsFragment extends Fragment implements LoaderManager.Loade
     @Override
     public CursorLoader onCreateLoader(int id, Bundle args) {
         String sortOrder = SQL.COLUMN_NAME + " ASC";
+        Uri providerUri = null;
+        if (mType == Type.Ingredient.id) {
+            providerUri = DbProvider.URI_INGREDIENTS;
+        } else if (mType == Type.Recipe.id) {
+            providerUri = DbProvider.URI_RECIPES;
+        } else {
+            throw new IllegalArgumentException("mType was not an expected value. mType = " + mType);
+        }
         return new CursorLoader(getContext(),
-                DbProvider.URI_INGREDIENTS,
+                providerUri,
                 null,
                 null,
                 null,
@@ -133,6 +138,18 @@ public class IngredientsFragment extends Fragment implements LoaderManager.Loade
         mAdapter.changeCursor(null);
     }
 
+    // TODO: Find a better way to handle this
+    public enum Type {
+        Ingredient(1),
+        Recipe(2);
+
+        public int id;
+
+        Type(int id) {
+            this.id = id;
+        }
+    }
+
     /**
      * This interface must be implemented by activities that contain this
      * fragment to allow an interaction in this fragment to be communicated
@@ -143,8 +160,8 @@ public class IngredientsFragment extends Fragment implements LoaderManager.Loade
      * "http://developer.android.com/training/basics/fragments/communicating.html"
      * >Communicating with Other Fragments</a> for more information.
      */
-    public interface IngredientListener {
+    public interface ItemListener {
         // TODO: Update argument type and name
-        void addEditIngredient(@Nullable Ingredient ingredient);
+        void addEdit(@Nullable Object item, int type);
     }
 }

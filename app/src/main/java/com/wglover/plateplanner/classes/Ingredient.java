@@ -6,15 +6,7 @@ import android.os.Parcelable;
 
 import com.wglover.plateplanner.database.SQL;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Random;
-
 public class Ingredient implements Parcelable {
-    public static final List<String> dummyIngredientNames = Arrays.asList("Pepper", "Onion", "Raddish", "Tomato", "Pickle", "Banana");
-    public static final List<String> dummyStores = Arrays.asList("Sams", "H-Mart", "Farmer's Market", "Publix", "Kroger");
-    public static final List<String> dummyCategories = Arrays.asList("Produce", "Canned Vegetables", "Asian", "Mexican", "Vegan");
     // After implementing the `Parcelable` interface, we need to create the
     // `Parcelable.Creator<MyParcelable> CREATOR` constant for our class;
     // Notice how it has our class specified as its type.
@@ -73,24 +65,6 @@ public class Ingredient implements Parcelable {
         ingredient.category = cursor.getString(SQL.COL_INDEX_CATEGORY);
         ingredient.units = Unit.valueOf(cursor.getString(SQL.COL_INDEX_UNITS));
         return ingredient;
-    }
-
-    public static ArrayList<Ingredient> createTestItems() {
-        ArrayList<Ingredient> ingredients = new ArrayList<Ingredient>();
-        Random rand = new Random();
-        String name = "";
-        String store = "";
-        String category = "";
-        Unit unit = Unit.cups;
-        for (int n = 0; n < 25; n++) {
-            name = dummyIngredientNames.get(rand.nextInt(dummyIngredientNames.size()));
-            store = dummyStores.get(rand.nextInt(dummyStores.size()));
-            category = dummyCategories.get(rand.nextInt(dummyCategories.size()));
-            unit = Unit.values()[rand.nextInt(Unit.values().length)];
-            Ingredient ingredient = new Ingredient(rand.nextLong(), name, store, category, unit);
-            ingredients.add(ingredient);
-        }
-        return ingredients;
     }
 
     @Override

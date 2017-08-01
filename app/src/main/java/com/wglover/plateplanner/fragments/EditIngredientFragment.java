@@ -70,7 +70,6 @@ public class EditIngredientFragment extends Fragment implements DbHandler.AsyncQ
         Bundle args = new Bundle();
         if (ingredient != null) {
             args.putParcelable(ARG_INGREDIENT, ingredient);
-            fragment.setArguments(args);
             // Ingredient already exists, so we need to update the existing ingredient
             // instead of creating a new one.
             args.putBoolean(ARG_CREATE, false);
@@ -250,11 +249,10 @@ public class EditIngredientFragment extends Fragment implements DbHandler.AsyncQ
         } else {
             throw new UnsupportedOperationException("Unexpected token " + token);
         }
-        cursor.moveToFirst();
-        do {
+        while (cursor.moveToNext()) {
             adapter.add(cursor.getString(cursor.getColumnIndexOrThrow(column)));
         }
-        while (cursor.moveToNext());
+
     }
 
     @Override

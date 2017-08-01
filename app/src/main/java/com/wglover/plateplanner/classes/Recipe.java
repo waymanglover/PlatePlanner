@@ -4,6 +4,8 @@ import android.database.Cursor;
 import android.os.Parcel;
 import android.os.Parcelable;
 
+import com.wglover.plateplanner.database.SQL;
+
 import java.util.ArrayList;
 
 /**
@@ -32,64 +34,37 @@ public class Recipe implements Parcelable {
     };
     public long id;
     public String name;
-    public ArrayList<Ingredient> ingredients;
-    public String instructions;
+    public ArrayList<RecipeIngredient> ingredients;
+    public String directions;
 
     // Should match writeToParcel
     public Recipe(Parcel in) {
         this.id = in.readLong();
         this.name = in.readString();
-        in.readTypedList(this.ingredients, Ingredient.CREATOR);
-        this.instructions = in.readString();
+        in.readTypedList(this.ingredients, RecipeIngredient.CREATOR);
+        this.directions = in.readString();
     }
 
-    public Recipe(long id, String name, ArrayList<Ingredient> ingredients, String instructions) {
+    public Recipe(long id, String name, ArrayList<RecipeIngredient> ingredients, String directions) {
         this.id = id;
         this.name = name;
         this.ingredients = ingredients;
-        this.instructions = instructions;
+        this.directions = directions;
     }
 
     public Recipe() {
         // ID is assigned by the database -- we'll leave it null for now
         this.name = "";
-        this.ingredients = new ArrayList<Ingredient>();
-        this.instructions = "";
+        this.ingredients = new ArrayList<RecipeIngredient>();
+        this.directions = "";
     }
 
     public static Recipe fromCursor(Cursor cursor) {
-        /*
-        Recipe ingredient = new Recipe();
-        ingredient.id = cursor.getInt(SQL.COL_INDEX_ID);
-        ingredient.name = cursor.getString(SQL.COL_INDEX_NAME);
-        ingredient.store = cursor.getString(SQL.COL_INDEX_STORE);
-        ingredient.category = cursor.getString(SQL.COL_INDEX_CATEGORY);
-        ingredient.units = Unit.valueOf(cursor.getString(SQL.COL_INDEX_UNITS));
-        return ingredient; */
-        // TODO: Fix this.
-        throw new UnsupportedOperationException();
-    }
-
-    public static ArrayList<Recipe> createTestItems() {
-        /*
-        ArrayList<Recipe> ingredients = new ArrayList<>();
-        Random rand = new Random();
-        String name = "";
-        String store = "";
-        String category = "";
-        Unit unit = Unit.cups;
-        for(int n = 0; n < 25; n++)
-        {
-            name = dummyIngredientNames.get(rand.nextInt(dummyIngredientNames.size()));
-            store = dummyStores.get(rand.nextInt(dummyStores.size()));
-            category = dummyCategories.get(rand.nextInt(dummyCategories.size()));
-            unit = Unit.values()[rand.nextInt(Unit.values().length)];
-            Recipe ingredient = new Recipe(rand.nextLong(), name, store, category, unit);
-            ingredients.add(ingredient);
-        }
-        return ingredients;
-        */
-        throw new UnsupportedOperationException();
+        Recipe recipe = new Recipe();
+        recipe.id = cursor.getInt(SQL.COL_INDEX_ID);
+        recipe.name = cursor.getString(SQL.COL_INDEX_NAME);
+        recipe.directions = cursor.getString(SQL.COL_INDEX_DIRECTIONS);
+        return recipe;
     }
 
     @Override
@@ -102,6 +77,6 @@ public class Recipe implements Parcelable {
         dest.writeLong(this.id);
         dest.writeString(this.name);
         dest.writeTypedList(this.ingredients);
-        dest.writeString(this.instructions);
+        dest.writeString(this.directions);
     }
 }

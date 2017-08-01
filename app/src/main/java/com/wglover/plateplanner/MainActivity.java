@@ -4,6 +4,7 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.design.widget.NavigationView;
+import android.support.v4.app.Fragment;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
@@ -13,13 +14,18 @@ import android.view.Menu;
 import android.view.MenuItem;
 
 import com.wglover.plateplanner.classes.Ingredient;
+import com.wglover.plateplanner.classes.Recipe;
 import com.wglover.plateplanner.fragments.EditIngredientFragment;
-import com.wglover.plateplanner.fragments.IngredientsFragment;
+import com.wglover.plateplanner.fragments.EditRecipeFragment;
+import com.wglover.plateplanner.fragments.ListFragment;
+
+import java.security.InvalidParameterException;
 
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener,
-        IngredientsFragment.IngredientListener,
-        EditIngredientFragment.OnEditIngredientInteractionListener {
+        ListFragment.ItemListener,
+        EditIngredientFragment.OnEditIngredientInteractionListener,
+        EditRecipeFragment.OnEditRecipeInteractionListener {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -41,7 +47,7 @@ public class MainActivity extends AppCompatActivity
         if (savedInstanceState != null) return;
 
         // Create a new Fragment to be placed in the activity layout
-        IngredientsFragment initialFragment = new IngredientsFragment();
+        ListFragment initialFragment = ListFragment.newInstance(ListFragment.Type.Ingredient.id);
         // Add the fragment
         getSupportFragmentManager().beginTransaction()
                 .add(R.id.content_layout, initialFragment)
@@ -61,6 +67,7 @@ public class MainActivity extends AppCompatActivity
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
+        // At the moment, no menu items are needed on the home screen.
         //getMenuInflater().inflate(R.menu.menu_details, menu);
         return false;
     }
@@ -79,25 +86,29 @@ public class MainActivity extends AppCompatActivity
     @SuppressWarnings("StatementWithEmptyBody")
     @Override
     public boolean onNavigationItemSelected(@NonNull MenuItem item) {
+        Fragment newFragment = null;
         // Handle navigation view item clicks here.
         int id = item.getItemId();
 
+        // Create a new Fragment to be placed in the activity layout
         if (id == R.id.nav_planner) {
             // TODO: Switch to planner fragment
         } else if (id == R.id.nav_shopping) {
             // TODO: Switch to shopping list fragment
-        } else if (id == R.id.nav_meals) {
-            // TODO: Switch to meals fragment
+        } else if (id == R.id.nav_recipes) {
+            newFragment = ListFragment.newInstance(ListFragment.Type.Recipe.id);
         } else if (id == R.id.nav_ingredients) {
-            // Create a new Fragment to be placed in the activity layout
-            IngredientsFragment ingredientsFragment = new IngredientsFragment();
-            // Add the fragment
-            getSupportFragmentManager().beginTransaction()
-                    .replace(R.id.content_layout, ingredientsFragment)
-                    .addToBackStack(null)
-                    .commit();
+            newFragment = ListFragment.newInstance(ListFragment.Type.Ingredient.id);
         } else if (id == R.id.nav_settings) {
             // TODO: Switch to settings
+        }
+
+        if (newFragment != null) {
+            // Add the fragment
+            getSupportFragmentManager().beginTransaction()
+                    .replace(R.id.content_layout, newFragment)
+                    .addToBackStack(null)
+                    .commit();
         }
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
@@ -106,20 +117,33 @@ public class MainActivity extends AppCompatActivity
     }
 
     @Override
-    public void onEditIngredientInteraction(Uri uri) {
+    public void addEdit(Object item, int type) {
+        // Create a new Fragment to be placed in the activity layout
+        Fragment editFragment = null;
 
+        if (type == ListFragment.Type.Ingredient.id) {
+            editFragment = EditIngredientFragment.newInstance((Ingredient) item);
+        } else if (type == ListFragment.Type.Recipe.id) {
+            editFragment = EditRecipeFragment.newInstance((Recipe) item);
+        }
+
+        if (editFragment != null) {
+            // Add the fragment
+            getSupportFragmentManager().beginTransaction()
+                    .replace(R.id.content_layout, editFragment)
+                    .addToBackStack(null)
+                    .commit();
+        } else throw new InvalidParameterException("item was not an expected type");
     }
 
     @Override
-    public void addEditIngredient(Ingredient ingredient) {
-        // Create a new Fragment to be placed in the activity layout
-        EditIngredientFragment editIngredientFragment = EditIngredientFragment.newInstance(ingredient);
+    public void onEditRecipeInteraction(Uri uri) {
+        // TODO: Remove this? Doesn't seem needed.
+    }
 
-        // Add the fragment
-        getSupportFragmentManager().beginTransaction()
-                .replace(R.id.content_layout, editIngredientFragment)
-                .addToBackStack(null)
-                .commit();
+    @Override
+    public void onEditIngredientInteraction(Uri uri) {
+        // TODO: Remove this? Doesn't seem needed.
     }
 }
 

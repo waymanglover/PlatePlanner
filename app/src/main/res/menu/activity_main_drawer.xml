@@ -11,7 +11,7 @@
             android:icon="@drawable/ic_shopping_cart_black_24dp"
             android:title="@string/nav_shopping" />
         <item
-            android:id="@+id/nav_meals"
+            android:id="@+id/nav_recipes"
             android:icon="@drawable/ic_restaurant_menu_black_24dp"
             android:title="@string/nav_recipes" />
         <item

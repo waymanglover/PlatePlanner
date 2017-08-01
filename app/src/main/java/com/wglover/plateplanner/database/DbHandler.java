@@ -8,11 +8,13 @@ import android.database.Cursor;
 import android.net.Uri;
 
 import com.wglover.plateplanner.classes.Ingredient;
+import com.wglover.plateplanner.classes.Recipe;
 
 /**
  * TODO: Improve class header comment.
  * Performs asynchronous statements through the DbProvider and provides an
  * interface for receiving callbacks on completion.
+ * Used mostly by the Edit fragments.
  */
 
 public class DbHandler extends AsyncQueryHandler {
@@ -79,7 +81,7 @@ public class DbHandler extends AsyncQueryHandler {
         values.put(SQL.COLUMN_CATEGORY, ingredient.category);
         values.put(SQL.COLUMN_STORE, ingredient.store);
         values.put(SQL.COLUMN_UNITS, ingredient.units.name());
-        startInsert(0, null, DbProvider.URI_INGREDIENTS, values);
+        create(DbProvider.URI_INGREDIENTS, values);
     }
 
     public void update(Ingredient ingredient) {
@@ -88,15 +90,45 @@ public class DbHandler extends AsyncQueryHandler {
         values.put(SQL.COLUMN_CATEGORY, ingredient.category);
         values.put(SQL.COLUMN_STORE, ingredient.store);
         values.put(SQL.COLUMN_UNITS, ingredient.units.name());
-        String selection = String.format("%s = ?", SQL.COLUMN_ID);
-        String selectionArgs[] = {String.valueOf(ingredient.id)};
-        startUpdate(0, null, DbProvider.URI_INGREDIENTS, values, selection, selectionArgs);
+        update(DbProvider.URI_INGREDIENTS, ingredient.id, values);
     }
 
     public void delete(Ingredient ingredient) {
+        delete(DbProvider.URI_INGREDIENTS, ingredient.id);
+    }
+
+    public void create(Recipe recipe) {
+        ContentValues values = new ContentValues();
+        values.put(SQL.COLUMN_NAME, recipe.name);
+        values.put(SQL.COLUMN_DIRECTIONS, recipe.directions);
+        create(DbProvider.URI_RECIPES, values);
+    }
+
+    public void update(Recipe recipe) {
+        ContentValues values = new ContentValues();
+        values.put(SQL.COLUMN_NAME, recipe.name);
+        values.put(SQL.COLUMN_DIRECTIONS, recipe.directions);
+        update(DbProvider.URI_RECIPES, recipe.id, values);
+    }
+
+    public void delete(Recipe recipe) {
+        delete(DbProvider.URI_RECIPES, recipe.id);
+    }
+
+    public void delete(Uri uri, long id) {
         String selection = String.format("%s = ?", SQL.COLUMN_ID);
-        String selectionArgs[] = {String.valueOf(ingredient.id)};
-        startDelete(0, null, DbProvider.URI_INGREDIENTS, selection, selectionArgs);
+        String selectionArgs[] = {String.valueOf(id)};
+        startDelete(0, null, uri, selection, selectionArgs);
+    }
+
+    public void update(Uri uri, long id, ContentValues values) {
+        String selection = String.format("%s = ?", SQL.COLUMN_ID);
+        String selectionArgs[] = {String.valueOf(id)};
+        startUpdate(0, null, uri, values, selection, selectionArgs);
+    }
+
+    public void create(Uri uri, ContentValues values) {
+        startInsert(0, null, DbProvider.URI_INGREDIENTS, values);
     }
 
     public interface AsyncQueryListener {
